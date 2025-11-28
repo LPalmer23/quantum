@@ -133,10 +133,17 @@ def run_quantum_pricing(
       - model_params (n_p, num_bins, dt, u, d, p_up)
     """
 
-    # --- 1. CRR time discretization ---
+
+        # --- 1. Modified step params for faster quantum spreading ---
     dt = T / N_steps
-    u = math.exp(sigma * math.sqrt(dt))
+
+    # Instead of u = exp(sigma * sqrt(dt)),
+    # use a "global" T scaling spread over N_steps:
+    # u = exp( sigma * sqrt(T) / N_steps )
+    step_vol = sigma * math.sqrt(T) / N_steps
+    u = math.exp(step_vol)
     d = 1.0 / u
+
 
     # risk-neutral probabilities
     p_up = (math.exp(r * dt) - d) / (u - d)
